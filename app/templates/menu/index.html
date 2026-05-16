@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Меню{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h4><i class="bi bi-cup-hot"></i> Меню</h4>
+  <a href="{{ url_for('menu.new') }}" class="btn btn-dark btn-sm"><i class="bi bi-plus"></i> Додати</a>
+</div>
+{% for cat in categories %}
+<h6 class="text-muted mt-3">{{ cat.name }}</h6>
+<table class="table table-sm table-hover mb-3">
+  <thead class="table-secondary"><tr><th>Назва</th><th>Ціна</th><th>Собівартість</th><th>Статус</th><th></th></tr></thead>
+  <tbody>
+  {% for item in items if item.category_id == cat.id %}
+  <tr>
+    <td>{{ item.name }}</td>
+    <td>{{ item.price }} грн</td>
+    <td>{{ item.cost_price or '—' }} {% if item.cost_price %}грн{% endif %}</td>
+    <td><span class="badge {% if item.is_available %}bg-success{% else %}bg-secondary{% endif %}">{% if item.is_available %}Доступно{% else %}Недоступно{% endif %}</span></td>
+    <td>
+      <form method="POST" action="{{ url_for('menu.toggle', id=item.id) }}" class="d-inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-sm btn-outline-secondary">Змінити</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Нове замовлення{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-plus-circle"></i> Нове замовлення</h4>
+<form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if branches %}
+  <div class="mb-3">
+    <label class="form-label">Філія</label>
+    <select name="branch_id" class="form-select" required>
+      <option value="">— Оберіть філію —</option>
+      {% for b in branches %}<option value="{{ b.id }}">{{ b.name }}</option>{% endfor %}
+    </select>
+  </div>
+  {% endif %}
+  <div class="card mb-3">
+    <div class="card-header"><strong>Позиції меню</strong></div>
+    <div class="card-body">
+      {% for cat_name, items in menu_items | groupby('category.name') %}
+      <h6 class="text-muted mt-2">{{ cat_name }}</h6>
+      {% for item in items %}
+      <div class="row align-items-center mb-2">
+        <div class="col-6">{{ item.name }} <small class="text-muted">{{ item.price }} грн</small></div>
+        <div class="col-3"><input type="number" name="qty_{{ item.id }}" class="form-control form-control-sm" min="0" value="0" style="width:80px"></div>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+  <button type="submit" class="btn btn-dark">Оформити замовлення</button>
+  <a href="{{ url_for('orders.index') }}" class="btn btn-outline-secondary">Скасувати</a>
+</form>
+{% endblock %}

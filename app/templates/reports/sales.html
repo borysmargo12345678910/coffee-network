@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Звіт з продажів{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-bar-chart-line me-2"></i>Звіт з продажів</h4>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form class="row g-3 align-items-end">
+      {% if current_user.is_admin %}
+      <div class="col-md-3">
+        <label class="form-label fw-semibold small">Філія</label>
+        <select name="branch_id" class="form-select form-select-sm">
+          <option value="">Всі філії</option>
+          {% for b in branches %}
+          <option value="{{ b.id }}" {% if branch_id == b.id %}selected{% endif %}>{{ b.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+      <div class="col-md-3">
+        <label class="form-label fw-semibold small">З дати</label>
+        <input type="date" name="date_from" value="{{ date_from }}" class="form-control form-control-sm">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label fw-semibold small">По дату</label>
+        <input type="date" name="date_to" value="{{ date_to }}" class="form-control form-control-sm">
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-coffee btn-sm w-100">
+          <i class="bi bi-funnel me-1"></i>Фільтр
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Summary stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="small text-muted">Загальна виручка</div>
+        <div class="fs-3 fw-bold" style="color:var(--coffee)">{{ "%.2f"|format(total_revenue) }} грн</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="small text-muted">Кількість замовлень</div>
+        <div class="fs-3 fw-bold" style="color:var(--coffee)">{{ total_orders }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="small text-muted">Середній чек</div>
+        <div class="fs-3 fw-bold" style="color:var(--coffee)">{{ "%.2f"|format(avg_check) }} грн</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart + Top items -->
+<div class="row g-3">
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-header"><h6 class="mb-0">Топ-10 позицій за кількістю</h6></div>
+      <div class="card-body">
+        <canvas id="topChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header"><h6 class="mb-0">Деталі топ-позицій</h6></div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>#</th><th>Позиція</th><th>Кількість</th><th>Сума</th></tr></thead>
+          <tbody>
+            {% for item in top_items %}
+            <tr>
+              <td class="text-muted">{{ loop.index }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.total_qty }}</td>
+              <td>{{ "%.0f"|format(item.total_sum|float) }} грн</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-3">Немає даних</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const labels = [{% for i in top_items %}"{{ i.name }}"{% if not loop.last %},{% endif %}{% endfor %}];
+const values = [{% for i in top_items %}{{ i.total_qty }}{% if not loop.last %},{% endif %}{% endfor %}];
+new Chart(document.getElementById('topChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      label: 'Кількість замовлень',
+      data: values,
+      backgroundColor: 'rgba(111,78,55,0.75)',
+      borderColor: 'rgba(44,26,14,0.9)',
+      borderWidth: 1,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: '#f0e8dc' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Звіти{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-bar-chart"></i> Аналітичні звіти</h4>
+<form class="row g-2 mb-4" method="GET">
+  <div class="col-auto"><label class="form-label">Від</label><input type="date" name="date_from" class="form-control" value="{{ date_from }}"></div>
+  <div class="col-auto"><label class="form-label">До</label><input type="date" name="date_to" class="form-control" value="{{ date_to }}"></div>
+  {% if branches %}
+  <div class="col-auto"><label class="form-label">Філія</label>
+    <select name="branch_id" class="form-select">
+      <option value="">Всі філії</option>
+      {% for b in branches %}<option value="{{ b.id }}" {% if branch_id == b.id %}selected{% endif %}>{{ b.name }}</option>{% endfor %}
+    </select></div>
+  {% endif %}
+  <div class="col-auto align-self-end"><button type="submit" class="btn btn-dark">Сформувати</button></div>
+</form>
+
+<div class="row mb-4">
+  <div class="col-md-4"><div class="card stat-card text-center py-3"><h2 class="text-success">{{ "%.0f"|format(total_revenue) }} грн</h2><p class="text-muted mb-0">Виручка</p></div></div>
+  <div class="col-md-4"><div class="card stat-card text-center py-3"><h2>{{ order_count }}</h2><p class="text-muted mb-0">Замовлень</p></div></div>
+  <div class="col-md-4"><div class="card stat-card text-center py-3"><h2>{{ avg_check }} грн</h2><p class="text-muted mb-0">Середній чек</p></div></div>
+</div>
+
+{% if top_items %}
+<div class="row">
+  <div class="col-md-6">
+    <h6>Топ позицій меню</h6>
+    <canvas id="topChart" height="250"></canvas>
+  </div>
+  {% if branch_data %}
+  <div class="col-md-6">
+    <h6>Виручка по філіях</h6>
+    <canvas id="branchChart" height="250"></canvas>
+  </div>
+  {% endif %}
+</div>
+<div class="table-responsive mt-3">
+<table class="table table-sm">
+  <thead class="table-dark"><tr><th>Позиція</th><th>Кількість</th><th>Сума</th></tr></thead>
+  <tbody>
+  {% for item in top_items %}
+  <tr><td>{{ item.name }}</td><td>{{ item.total_qty }}</td><td>{{ "%.2f"|format(item.total_sum) }} грн</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="text-muted text-center py-4">Немає даних за вибраний період</p>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+{% if top_items %}
+<script>
+const topCtx = document.getElementById('topChart').getContext('2d');
+new Chart(topCtx, {type:'bar', data:{
+  labels: {{ top_items | map(attribute='name') | list | tojson }},
+  datasets:[{label:'Кількість', data: {{ top_items | map(attribute='total_qty') | list | tojson }},
+    backgroundColor:'rgba(111,78,55,0.7)', borderColor:'#6F4E37', borderWidth:1}]
+}, options:{responsive:true, plugins:{legend:{display:false}}}});
+{% if branch_data %}
+const bCtx = document.getElementById('branchChart').getContext('2d');
+new Chart(bCtx, {type:'pie', data:{
+  labels: {{ branch_data | map(attribute='name') | list | tojson }},
+  datasets:[{data: {{ branch_data | map(attribute='revenue') | map('float') | list | tojson }},
+    backgroundColor:['#2C1A0E','#6F4E37','#C49A6C','#A0522D','#D2691E']}]
+}});
+{% endif %}
+</script>
+{% endif %}
+{% endblock %}

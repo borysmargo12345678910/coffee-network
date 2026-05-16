@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Нова зміна{% endblock %}
+{% block content %}
+<h4 class="mb-3">Нова робоча зміна</h4>
+<div class="col-md-5">
+<form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if branches %}
+  <div class="mb-3"><label class="form-label">Філія</label>
+    <select name="branch_id" class="form-select" required>
+      {% for b in branches %}<option value="{{ b.id }}">{{ b.name }}</option>{% endfor %}
+    </select></div>
+  {% endif %}
+  <div class="mb-3"><label class="form-label">Співробітник</label>
+    <select name="user_id" class="form-select" required>
+      {% for s in staff %}<option value="{{ s.id }}">{{ s.full_name or s.username }}</option>{% endfor %}
+    </select></div>
+  <div class="mb-3"><label class="form-label">Дата</label><input type="date" name="shift_date" class="form-control" required></div>
+  <div class="mb-3"><label class="form-label">Примітка</label><input name="note" class="form-control"></div>
+  <button type="submit" class="btn btn-dark">Зберегти</button>
+  <a href="{{ url_for('staff.shifts') }}" class="btn btn-outline-secondary">Назад</a>
+</form>
+</div>
+{% endblock %}

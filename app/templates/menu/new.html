@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Нова позиція меню{% endblock %}
+{% block content %}
+<h4 class="mb-3">Нова позиція меню</h4>
+<div class="col-md-6">
+<form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3"><label class="form-label">Назва</label><input name="name" class="form-control" required></div>
+  <div class="mb-3"><label class="form-label">Категорія</label>
+    <select name="category_id" class="form-select" required>
+      {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+    </select></div>
+  <div class="row">
+    <div class="col mb-3"><label class="form-label">Ціна (грн)</label><input type="number" name="price" class="form-control" step="0.01" required></div>
+    <div class="col mb-3"><label class="form-label">Собівартість (грн)</label><input type="number" name="cost_price" class="form-control" step="0.01"></div>
+  </div>
+  <div class="mb-3"><label class="form-label">Опис</label><textarea name="description" class="form-control" rows="2"></textarea></div>
+  <button type="submit" class="btn btn-dark">Додати</button>
+  <a href="{{ url_for('menu.index') }}" class="btn btn-outline-secondary">Назад</a>
+</form>
+</div>
+{% endblock %}

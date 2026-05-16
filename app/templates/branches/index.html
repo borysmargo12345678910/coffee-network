@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Філії{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h4><i class="bi bi-shop"></i> Філії мережі</h4>
+  <a href="{{ url_for('branches.new') }}" class="btn btn-dark btn-sm"><i class="bi bi-plus"></i> Додати</a>
+</div>
+<div class="row">
+{% for b in branches %}
+<div class="col-md-4 mb-3">
+  <div class="card stat-card h-100">
+    <div class="card-body">
+      <h5 class="card-title">{{ b.name }}</h5>
+      <p class="text-muted mb-1"><i class="bi bi-geo-alt"></i> {{ b.address }}</p>
+      {% if b.phone %}<p class="text-muted"><i class="bi bi-telephone"></i> {{ b.phone }}</p>{% endif %}
+      <small class="text-muted">Відкрито: {{ b.created_at.strftime('%d.%m.%Y') }}</small>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="col"><p class="text-muted">Філій ще немає</p></div>
+{% endfor %}
+</div>
+{% endblock %}

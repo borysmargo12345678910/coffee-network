@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Персонал{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h4><i class="bi bi-people"></i> Персонал</h4>
+  <a href="{{ url_for('staff.shifts') }}" class="btn btn-outline-dark btn-sm">Зміни</a>
+</div>
+<table class="table table-hover">
+  <thead class="table-dark"><tr><th>Ім'я</th><th>Логін</th><th>Роль</th><th>Філія</th><th>Статус</th></tr></thead>
+  <tbody>
+  {% for s in staff %}
+  <tr>
+    <td>{{ s.full_name or '—' }}</td>
+    <td>{{ s.username }}</td>
+    <td><span class="badge {% if s.role == 'admin' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ s.role }}</span></td>
+    <td>{{ s.branch.name if s.branch else '—' }}</td>
+    <td><span class="badge {% if s.is_active %}bg-success{% else %}bg-danger{% endif %}">{% if s.is_active %}Активний{% else %}Неактивний{% endif %}</span></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

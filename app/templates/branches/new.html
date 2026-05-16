@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Нова філія{% endblock %}
+{% block content %}
+<h4 class="mb-3">Нова філія</h4>
+<div class="col-md-5">
+<form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3"><label class="form-label">Назва</label><input name="name" class="form-control" required></div>
+  <div class="mb-3"><label class="form-label">Адреса</label><input name="address" class="form-control" required></div>
+  <div class="mb-3"><label class="form-label">Телефон</label><input name="phone" class="form-control"></div>
+  <button type="submit" class="btn btn-dark">Додати</button>
+  <a href="{{ url_for('branches.index') }}" class="btn btn-outline-secondary">Назад</a>
+</form>
+</div>
+{% endblock %}

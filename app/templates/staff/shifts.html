@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Зміни{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h4>Робочі зміни</h4>
+  <a href="{{ url_for('staff.new_shift') }}" class="btn btn-dark btn-sm"><i class="bi bi-plus"></i> Додати зміну</a>
+</div>
+<table class="table table-hover">
+  <thead class="table-dark"><tr><th>Дата</th><th>Філія</th><th>Співробітник</th><th>Примітка</th></tr></thead>
+  <tbody>
+  {% for s in shifts %}
+  <tr>
+    <td>{{ s.shift_date.strftime('%d.%m.%Y') }}</td>
+    <td>{{ s.branch.name }}</td>
+    <td>{{ s.user.full_name or s.user.username }}</td>
+    <td>{{ s.note or '—' }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="4" class="text-center text-muted">Змін ще немає</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

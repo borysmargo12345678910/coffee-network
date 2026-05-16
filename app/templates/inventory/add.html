@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Додати позицію{% endblock %}
+{% block content %}
+<h4 class="mb-3">Додати товар на склад</h4>
+<div class="col-md-6">
+<form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if branches %}
+  <div class="mb-3"><label class="form-label">Філія</label>
+    <select name="branch_id" class="form-select" required>
+      <option value="">— Оберіть —</option>
+      {% for b in branches %}<option value="{{ b.id }}">{{ b.name }}</option>{% endfor %}
+    </select></div>
+  {% endif %}
+  <div class="mb-3"><label class="form-label">Назва товару</label><input name="product_name" class="form-control" required></div>
+  <div class="row">
+    <div class="col mb-3"><label class="form-label">Залишок</label><input type="number" name="quantity" class="form-control" min="0" step="0.001" value="0"></div>
+    <div class="col mb-3"><label class="form-label">Одиниця</label><input name="unit" class="form-control" value="шт."></div>
+    <div class="col mb-3"><label class="form-label">Мінімум</label><input type="number" name="min_quantity" class="form-control" min="0" step="0.001" value="0"></div>
+  </div>
+  <button type="submit" class="btn btn-dark">Додати</button>
+  <a href="{{ url_for('inventory.index') }}" class="btn btn-outline-secondary">Назад</a>
+</form>
+</div>
+{% endblock %}

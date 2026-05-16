@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Замовлення #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h4>Замовлення #{{ order.id }} <span class="badge badge-{{ order.status }}">{{ order.status_label() }}</span></h4>
+  <a href="{{ url_for('orders.index') }}" class="btn btn-outline-secondary btn-sm">← Назад</a>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-body">
+        <p><strong>Філія:</strong> {{ order.branch.name }}</p>
+        <p><strong>Дата:</strong> {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p><strong>Сума:</strong> {{ order.total_amount }} грн</p>
+      </div>
+    </div>
+    {% if order.status in ['new','in_progress'] %}
+    <div class="card">
+      <div class="card-header">Змінити статус</div>
+      <div class="card-body">
+        {% if order.status == 'new' %}
+        <form method="POST" action="{{ url_for('orders.change_status', id=order.id) }}" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="status" value="in_progress">
+          <button class="btn btn-warning btn-sm">▶ Готується</button>
+        </form>
+        {% endif %}
+        {% if order.status in ['new','in_progress'] %}
+        <form method="POST" action="{{ url_for('orders.change_status', id=order.id) }}" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="status" value="{% if order.status == 'in_progress' %}done{% else %}cancelled{% endif %}">
+          <button class="btn btn-{% if order.status == 'in_progress' %}success{% else %}secondary{% endif %} btn-sm">
+            {% if order.status == 'in_progress' %}✓ Виконано{% else %}✗ Скасувати{% endif %}
+          </button>
+        </form>
+        {% if order.status == 'in_progress' %}
+        <form method="POST" action="{{ url_for('orders.change_status', id=order.id) }}" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="status" value="cancelled">
+          <button class="btn btn-secondary btn-sm">✗ Скасувати</button>
+        </form>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Склад замовлення</div>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Позиція</th><th>К-сть</th><th>Ціна</th><th>Сума</th></tr></thead>
+        <tbody>
+        {% for item in order.items %}
+        <tr>
+          <td>{{ item.menu_item.name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unit_price }} грн</td>
+          <td><strong>{{ item.subtotal }} грн</strong></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot><tr class="table-dark"><td colspan="3"><strong>Всього</strong></td><td><strong>{{ order.total_amount }} грн</strong></td></tr></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
